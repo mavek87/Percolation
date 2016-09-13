@@ -26,7 +26,7 @@ public class Percolation {
 
     private final int N;
     private final boolean[][] openSitesGrid;
-    private final int[][] incrementalSitesCoordinates;
+    private final int[][] incrementalSitesMatrix;
 
     private final int virtualTop;
     private final int virtualBottom;
@@ -42,42 +42,28 @@ public class Percolation {
         if (n <= 0) {
             throw new IllegalArgumentException();
         }
-        unionFind = new WeightedQuickUnionUF(n * n + 2);
-        openSitesGrid = new boolean[n + 1][n + 1];
-        incrementalSitesCoordinates = new int[n + 1][n + 1];
 
-        virtualTop = n * n + 1;
-        virtualBottom = n * n;
+        N = n;
+        unionFind = new WeightedQuickUnionUF(N * N + 2);
+        openSitesGrid = new boolean[N + 1][N + 1];
+        incrementalSitesMatrix = new int[N + 1][N + 1];
+
+        virtualTop = N * N + 1;
+        virtualBottom = N * n;
 
         int i = 0;
         for (int y = 1; y < n + 1; y++) {
             for (int x = 1; x < n + 1; x++) {
                 openSitesGrid[x][y] = false;
-                incrementalSitesCoordinates[x][y] = i;
+                incrementalSitesMatrix[x][y] = i;
                 if (y == 1) {
-                    unionFind.union(virtualTop, incrementalSitesCoordinates[x][y]);
+                    unionFind.union(virtualTop, incrementalSitesMatrix[x][y]);
                 } else if (y == n) {
-                    unionFind.union(virtualBottom, incrementalSitesCoordinates[x][y]);
+                    unionFind.union(virtualBottom, incrementalSitesMatrix[x][y]);
                 }
-                System.out.print("(x=" + x + ",y=" + y + "):" + incrementalSitesCoordinates[x][y] + "\t");
                 i++;
             }
-            System.out.println("\n");
         }
-        System.out.println("\n");
-        N = n;
-
-        System.out.println("Virtual top => " + virtualTop);
-        System.out.println("Virtual bottom => " + virtualBottom);
-        
-        
-        System.out.println("1,1 è connesso con 1,1? => " + unionFind.connected(incrementalSitesCoordinates[1][1], incrementalSitesCoordinates[1][1]));
-        System.out.println("1,1 è connesso con 1,2? => " + unionFind.connected(incrementalSitesCoordinates[1][1], incrementalSitesCoordinates[1][2]));
-        System.out.println("1,1 è connesso con 3,1? => " + unionFind.connected(incrementalSitesCoordinates[1][1], incrementalSitesCoordinates[3][1]));
-
-        System.out.println("padre di 3,1 è => " + unionFind.find(incrementalSitesCoordinates[1][1]) + " padre di 2,1 è => " + unionFind.find(incrementalSitesCoordinates[2][1]));
-
-//        System.out.println("1 è connesso con n+1? => " + unionFind.connected(1, n+1));
     }
 
     /**
@@ -98,14 +84,13 @@ public class Percolation {
             for (int index = 0; index < 4; index++) {
                 try {
                     if (isOpen(xNeighbours[index], yNeighbours[index])) {
-                        unionFind.union(incrementalSitesCoordinates[x][y], incrementalSitesCoordinates[xNeighbours[index]][yNeighbours[index]]);
+                        int neighbour = incrementalSitesMatrix[xNeighbours[index]][yNeighbours[index]];
+                        unionFind.union(incrementalSitesMatrix[x][y], neighbour);
                     }
                 } catch (Exception ex) {
                 }
             }
         }
-
-        printMatrix();
     }
 
     /**
@@ -131,13 +116,23 @@ public class Percolation {
      */
     public boolean isFull(int x, int y) throws IllegalArgumentException {
         checkIfCoordinatesAreInsideBounds(x, y);
+        boolean isSiteFull = false;
         if (isOpen(x, y)) {
-            if (unionFind.connected(unionFind.find(incrementalSitesCoordinates[x][y]), virtualTop)) {
-                return true;
-            }
+            int siteRoot = unionFind.find(incrementalSitesMatrix[x][y]);
+            isSiteFull = unionFind.connected(siteRoot, virtualTop);
         }
-        return false;
+        return isSiteFull;
     }
+    
+    /**
+     * Check if the system percolates
+     * 
+     * @return if the system percolates or not 
+     */
+    public boolean percolates() {
+        return unionFind.connected(virtualTop, virtualBottom);
+    }
+
 
     private void checkIfCoordinatesAreInsideBounds(int x, int y) throws IndexOutOfBoundsException {
         if (x < 1 || y < 1 || x > N || y > N) {
@@ -147,13 +142,41 @@ public class Percolation {
 
     public static void main(String[] args) {
         Percolation percolation = new Percolation(6);
+        percolation.printTest();
+
         WeightedQuickUnionUF unionFind = new WeightedQuickUnionUF(6);
 
-        percolation.open(1, 1);
+//        percolation.open(1, 1);
+    }
+
+    private void printTest() {
+        System.out.println("*********** GRAPHICAL TEST ***********");
+        printOpenSitesMatrix();
+        printIncrementalSitesMatrix();
+        System.out.println("N => " + N);
+        System.out.println("Virtual top => " + virtualTop);
+        System.out.println("Virtual bottom => " + virtualBottom);
+
+        System.out.println("is 1,1 connected with 1,1? => " + unionFind.connected(incrementalSitesMatrix[1][1], incrementalSitesMatrix[1][1]));
+        System.out.println("is 1,1 connected with 1,2? => " + unionFind.connected(incrementalSitesMatrix[1][1], incrementalSitesMatrix[1][2]));
+        System.out.println("is 1,1 connected with 3,1? => " + unionFind.connected(incrementalSitesMatrix[1][1], incrementalSitesMatrix[3][1]));
+
+        System.out.println("1,3 father => " + unionFind.find(incrementalSitesMatrix[1][3]) + " 2,1 father => " + unionFind.find(incrementalSitesMatrix[2][1]));
+        System.out.println("**************************************\n");
 
     }
 
-    private void printMatrix() {
+    private void printIncrementalSitesMatrix() {
+        for (int y = 1; y < N + 1; y++) {
+            for (int x = 1; x < N + 1; x++) {
+                System.out.print("(x=" + x + ",y=" + y + "):" + incrementalSitesMatrix[x][y] + "\t");
+            }
+            System.out.println("\n");
+        }
+        System.out.println("\n");
+    }
+
+    private void printOpenSitesMatrix() {
         for (int y = 1; y < N + 1; y++) {
             for (int x = 1; x < N + 1; x++) {
                 System.out.print("(x=" + x + ",y=" + y + "):" + openSitesGrid[x][y] + "\t");
