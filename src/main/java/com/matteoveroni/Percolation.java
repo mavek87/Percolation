@@ -1,5 +1,6 @@
 package com.matteoveroni;
 
+import edu.princeton.cs.algs4.StdRandom;
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 /**
@@ -25,7 +26,7 @@ import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 public class Percolation {
 
     private final int N;
-    private final boolean[][] openSitesGrid;
+    private final boolean[][] openSitesMatrix;
     private final int[][] incrementalSitesMatrix;
 
     private final int virtualTop;
@@ -45,7 +46,7 @@ public class Percolation {
 
         N = n;
         unionFind = new WeightedQuickUnionUF(N * N + 2);
-        openSitesGrid = new boolean[N + 1][N + 1];
+        openSitesMatrix = new boolean[N + 1][N + 1];
         incrementalSitesMatrix = new int[N + 1][N + 1];
 
         virtualTop = N * N + 1;
@@ -54,7 +55,7 @@ public class Percolation {
         int i = 0;
         for (int y = 1; y < n + 1; y++) {
             for (int x = 1; x < n + 1; x++) {
-                openSitesGrid[x][y] = false;
+                openSitesMatrix[x][y] = false;
                 incrementalSitesMatrix[x][y] = i;
                 if (y == 1) {
                     unionFind.union(virtualTop, incrementalSitesMatrix[x][y]);
@@ -75,7 +76,7 @@ public class Percolation {
     public void open(int x, int y) throws IllegalArgumentException {
         checkIfCoordinatesAreInsideBounds(x, y);
         if (!isOpen(x, y)) {
-            openSitesGrid[x][y] = true;
+            openSitesMatrix[x][y] = true;
 
             // TOP => RIGHT => BOTTOM => LEFT
             final int xNeighbours[] = {x, x + 1, x, x - 1};
@@ -102,7 +103,7 @@ public class Percolation {
      */
     public boolean isOpen(int x, int y) throws IllegalArgumentException {
         checkIfCoordinatesAreInsideBounds(x, y);
-        return openSitesGrid[x][y];
+        return openSitesMatrix[x][y];
     }
 
     /**
@@ -123,16 +124,15 @@ public class Percolation {
         }
         return isSiteFull;
     }
-    
+
     /**
      * Check if the system percolates
-     * 
-     * @return if the system percolates or not 
+     *
+     * @return if the system percolates or not
      */
     public boolean percolates() {
         return unionFind.connected(virtualTop, virtualBottom);
     }
-
 
     private void checkIfCoordinatesAreInsideBounds(int x, int y) throws IndexOutOfBoundsException {
         if (x < 1 || y < 1 || x > N || y > N) {
@@ -141,12 +141,34 @@ public class Percolation {
     }
 
     public static void main(String[] args) {
-        Percolation percolation = new Percolation(6);
-        percolation.printTest();
+        int n = 1000;
 
-        WeightedQuickUnionUF unionFind = new WeightedQuickUnionUF(6);
+        Percolation percolation = new Percolation(n);
+//      percolation.printTest();
+
+        int nmbOpen = 0;
+        for (int i = 0; !percolation.percolates(); i++) {
+            // Choose a site (row i, column j) uniformly at random among all blocked sites.
+            int xRandom = StdRandom.uniform(1, n + 1);
+            int yRandom = StdRandom.uniform(1, n + 1);
+            // Open the site (row i, column j). 
+            if (!percolation.isOpen(xRandom, yRandom)) {
+                percolation.open(xRandom, yRandom);
+                nmbOpen++;
+            }
+        }
+
+        System.out.println("nbm open => " + nmbOpen);
+        System.out.println("n/nmbOpen => " + (double)nmbOpen/(n*n));
 
 //        percolation.open(1, 1);
+//        percolation.open(1, 2);
+//        percolation.open(1, 3);
+//        percolation.open(1, 4);
+//        percolation.open(1, 5);
+//        percolation.open(2, 5);
+//        percolation.open(2, 6);
+//        System.out.println("Percolate? " + percolation.percolates());
     }
 
     private void printTest() {
@@ -179,7 +201,7 @@ public class Percolation {
     private void printOpenSitesMatrix() {
         for (int y = 1; y < N + 1; y++) {
             for (int x = 1; x < N + 1; x++) {
-                System.out.print("(x=" + x + ",y=" + y + "):" + openSitesGrid[x][y] + "\t");
+                System.out.print("(x=" + x + ",y=" + y + "):" + openSitesMatrix[x][y] + "\t");
             }
             System.out.println("\n");
         }
