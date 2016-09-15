@@ -159,7 +159,7 @@ public class Percolation {
         }
 
         System.out.println("nbm open => " + nmbOpen);
-        System.out.println("n/nmbOpen => " + (double)nmbOpen/(n*n));
+        System.out.println("n/nmbOpen => " + (double) nmbOpen / (n * n));
 
 //        percolation.open(1, 1);
 //        percolation.open(1, 2);
