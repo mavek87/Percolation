@@ -5,7 +5,8 @@ sourceCompatibility = '1.8'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 //mainClassName = 'com.matteoveroni.Percolation'
-mainClassName = 'com.matteoveroni.PercolationVisualizer'
+mainClassName = 'com.matteoveroni.PercolationStats'
+//mainClassName = 'com.matteoveroni.PercolationVisualizer'
 //mainClassName = 'com.matteoveroni.InteractivePercolationVisualizer'
 ext.mainClass = mainClassName
 
@@ -32,11 +33,15 @@ jar{
     }
 }
 
-//ext.cliargs = 'build/libs/'
+// Arg for "PercolationStats"
+ext.cliargs = ["100", "200"]
+
+// Arg For "PercolationVisualizer"
+//ext.cliargs = 'input20.txt'
 
 // Fa partire il programma usando i parametri 'cliargs'
 task run(type : JavaExec, overwrite: true){
     main = mainClass
     classpath = sourceSets.main.runtimeClasspath
-    //    args cliargs
+    args cliargs
 }
