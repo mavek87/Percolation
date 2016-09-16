@@ -1,11 +1,11 @@
 apply plugin: 'java'
+apply plugin: 'application'
 
 sourceCompatibility = '1.8'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
-if (!hasProperty('mainClass')) {
-    ext.mainClass = 'com.matteoveroni.Percolation'
-}
+mainClassName = 'com.matteoveroni.PercolationVisualizer'
+ext.mainClass = mainClassName
 
 repositories {
     mavenCentral()
@@ -14,4 +14,27 @@ repositories {
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.10'
     compile fileTree(dir: 'libs', include: ['*.jar'])
+}
+
+task copyDependenciesIntoBuildLibsDir( type: Copy ) {
+    from configurations.runtime
+    into "$buildDir/libs/lib"
+}
+
+jar{
+    dependsOn copyDependenciesIntoBuildLibsDir
+    manifest {
+        attributes("Manifest-Version" : "1.0", "Created By Matteo Veroni")
+        attributes 'Main-Class': mainClassName
+        attributes 'Class-Path': configurations.runtime.collect { "lib/" + it.getName()}.join(' ')
+    }
+}
+
+//ext.cliargs = 'build/libs/xmlfiles/prova2.xml'
+
+// Fa partire il programma usando i parametri 'cliargs'
+task run(type : JavaExec, overwrite: true){
+    main = mainClass
+    classpath = sourceSets.main.runtimeClasspath
+    //    args cliargs
 }
