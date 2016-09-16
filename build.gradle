@@ -5,7 +5,8 @@ sourceCompatibility = '1.8'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 //mainClassName = 'com.matteoveroni.Percolation'
-mainClassName = 'com.matteoveroni.InteractivePercolationVisualizer'
+mainClassName = 'com.matteoveroni.PercolationVisualizer'
+//mainClassName = 'com.matteoveroni.InteractivePercolationVisualizer'
 ext.mainClass = mainClassName
 
 repositories {

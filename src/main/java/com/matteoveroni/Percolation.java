@@ -53,14 +53,15 @@ public class Percolation {
 		virtualBottom = N * n;
 
 		int i = 0;
-		for (int y = 1; y < n + 1; y++) {
-			for (int x = 1; x < n + 1; x++) {
-				openSitesMatrix[x][y] = false;
-				incrementalSitesMatrix[x][y] = i;
-				if (y == 1) {
-					unionFind.union(virtualTop, incrementalSitesMatrix[x][y]);
-				} else if (y == n) {
-					unionFind.union(virtualBottom, incrementalSitesMatrix[x][y]);
+		for (int x = 1; x < n + 1; x++) {
+			for (int y = 1; y < n + 1; y++) {
+
+				openSitesMatrix[y][x] = false;
+				incrementalSitesMatrix[y][x] = i;
+				if (x == 1) {
+					unionFind.union(virtualTop, incrementalSitesMatrix[y][x]);
+				} else if (x == n) {
+					unionFind.union(virtualBottom, incrementalSitesMatrix[y][x]);
 				}
 				i++;
 			}
@@ -76,7 +77,7 @@ public class Percolation {
 	public void open(int x, int y) throws IllegalArgumentException {
 		checkIfCoordinatesAreInsideBounds(x, y);
 		if (!isOpen(x, y)) {
-			openSitesMatrix[x][y] = true;
+			openSitesMatrix[y][x] = true;
 
 			// TOP => RIGHT => BOTTOM => LEFT
 			final int xNeighbours[] = {x, x + 1, x, x - 1};
@@ -85,8 +86,8 @@ public class Percolation {
 			for (int index = 0; index < 4; index++) {
 				try {
 					if (isOpen(xNeighbours[index], yNeighbours[index])) {
-						int neighbour = incrementalSitesMatrix[xNeighbours[index]][yNeighbours[index]];
-						unionFind.union(incrementalSitesMatrix[x][y], neighbour);
+						int neighbour = incrementalSitesMatrix[yNeighbours[index]][xNeighbours[index]];
+						unionFind.union(incrementalSitesMatrix[y][x], neighbour);
 					}
 				} catch (Exception ex) {
 				}
@@ -103,7 +104,7 @@ public class Percolation {
 	 */
 	public boolean isOpen(int x, int y) throws IllegalArgumentException {
 		checkIfCoordinatesAreInsideBounds(x, y);
-		return openSitesMatrix[x][y];
+		return openSitesMatrix[y][x];
 	}
 
 	/**
@@ -119,7 +120,7 @@ public class Percolation {
 		checkIfCoordinatesAreInsideBounds(x, y);
 		boolean isSiteFull = false;
 		if (isOpen(x, y)) {
-			int siteRoot = unionFind.find(incrementalSitesMatrix[x][y]);
+			int siteRoot = unionFind.find(incrementalSitesMatrix[y][x]);
 			isSiteFull = unionFind.connected(siteRoot, virtualTop);
 		}
 		return isSiteFull;
@@ -183,8 +184,8 @@ public class Percolation {
 	}
 
 	private void printIncrementalSitesMatrix() {
-		for (int y = 1; y < N + 1; y++) {
-			for (int x = 1; x < N + 1; x++) {
+		for (int x = 1; x < N + 1; x++) {
+			for (int y = 1; y < N + 1; y++) {
 				System.out.print("(x=" + x + ",y=" + y + "):" + incrementalSitesMatrix[x][y] + "\t");
 			}
 			System.out.println("\n");
@@ -193,8 +194,8 @@ public class Percolation {
 	}
 
 	private void printOpenSitesMatrix() {
-		for (int y = 1; y < N + 1; y++) {
-			for (int x = 1; x < N + 1; x++) {
+		for (int x = 1; x < N + 1; x++) {
+			for (int y = 1; y < N + 1; y++) {
 				System.out.print("(x=" + x + ",y=" + y + "):" + openSitesMatrix[x][y] + "\t");
 			}
 			System.out.println("\n");
