@@ -37,7 +37,7 @@ jar{
 ext.cliargs = ["100", "200"]
 
 // Arg For "PercolationVisualizer"
-//ext.cliargs = 'input20.txt'
+//ext.cliargs = '/tests/sedgewick60.txt'
 
 // Fa partire il programma usando i parametri 'cliargs'
 task run(type : JavaExec, overwrite: true){
