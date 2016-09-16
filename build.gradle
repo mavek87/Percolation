@@ -4,7 +4,8 @@ apply plugin: 'application'
 sourceCompatibility = '1.8'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
-mainClassName = 'com.matteoveroni.PercolationVisualizer'
+//mainClassName = 'com.matteoveroni.Percolation'
+mainClassName = 'com.matteoveroni.InteractivePercolationVisualizer'
 ext.mainClass = mainClassName
 
 repositories {
@@ -30,7 +31,7 @@ jar{
     }
 }
 
-//ext.cliargs = 'build/libs/xmlfiles/prova2.xml'
+//ext.cliargs = 'build/libs/'
 
 // Fa partire il programma usando i parametri 'cliargs'
 task run(type : JavaExec, overwrite: true){
