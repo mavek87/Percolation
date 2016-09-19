@@ -132,7 +132,11 @@ public class Percolation {
 	 * @return if the system percolates or not
 	 */
 	public boolean percolates() {
-		return unionFind.connected(virtualTop, virtualBottom);
+		if (N == 1) {
+			return isOpen(1, 1);
+		} else {
+			return unionFind.connected(virtualTop, virtualBottom);
+		}
 	}
 
 	private void checkIfCoordinatesAreInsideBounds(int x, int y) throws IndexOutOfBoundsException {
